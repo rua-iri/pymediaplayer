@@ -2,6 +2,8 @@ import tkinter as tk
 import requests
 import json
 
+from Video import Video
+
 
 
 def printEntryText(event):
@@ -16,12 +18,17 @@ def searchYT(searchQuery):
 
     for dat in searchData:
         try:
-            print(dat["title"])
+            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][0]["url"]))
         except:
             print("Title Not Found")
+    
+    #TODO add new label to the window for each result
+    for vid in vidList:
+        print(vid.title + vid.url + vid.thumbnail)
+        print()
 
 
-
+vidList = []
 window = tk.Tk()
 greeting = tk.Label(text="blah")
 greeting.pack()
