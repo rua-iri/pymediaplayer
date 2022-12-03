@@ -6,9 +6,10 @@ from Video import Video
 
 
 
-def printEntryText(event):
+def searchButtonFunct(event):
     entryText = srchEntry.get()
     searchYT(entryText)
+
 
 
 def searchYT(searchQuery):
@@ -22,25 +23,49 @@ def searchYT(searchQuery):
         except:
             print("Title Not Found")
     
-    #TODO add new label to the window for each result
-    for vid in vidList:
-        print(vid.title + vid.url + vid.thumbnail)
-        print()
+    if len(vidList)<10:
+        for vid in vidList:
+            showResult(vid)
+    
+    else:
+        for i in range(10):
+            showResult(vidList[i])
+            
+
+
+
+def showResult(vdo):
+    labFram = tk.LabelFrame(window, pady=2)
+    labFram.pack()
+
+    #label for the video title
+    vidLabel = tk.Label(labFram, text=vdo.title, padx=2);
+    vidLabel.pack(side=tk.LEFT)
+
+    #button to open the video
+    vidButton = tk.Button(labFram, text="Watch", command= lambda: openVideo(vdo.url))
+    vidButton.pack(side=tk.RIGHT)
+
+
+def openVideo(videoCode):
+    print(videoCode)
 
 
 vidList = []
 window = tk.Tk()
+window.attributes('-zoomed', True)
+
 greeting = tk.Label(text="blah")
 greeting.pack()
 
 
-srchEntry = tk.Entry(text="bleh")
-srchBtn = tk.Button(text="Search")
+srchEntry = tk.Entry(width=25)
+srchBtn = tk.Button(text="Search", width=5)
 
 srchEntry.pack()
 srchBtn.pack()
 
-srchBtn.bind("<Button-1>", printEntryText)
+srchBtn.bind("<Button-1>", searchButtonFunct)
 
 
 window.mainloop()
