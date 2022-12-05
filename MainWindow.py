@@ -45,19 +45,18 @@ def searchYT(searchQuery):
 
 
 def showResult(vdo, cntr):
-    labFram = tk.LabelFrame(window, pady=2)
+    labFram = tk.LabelFrame(srchFrame, pady=2)
     labFram.pack()
-
 
 
     imgPage = urllib.request.urlopen(vdo.thumbnail)
     pilImg = Image.open(io.BytesIO(imgPage.read()))
     tkImg = ImageTk.PhotoImage(pilImg)
-    
+
     photoList.append(tkImg)
     imgLabel = tk.Label(labFram, image=photoList[cntr])
     imgLabel.pack(side=tk.LEFT)
-    
+
     
     print(vdo.thumbnail)
 
@@ -81,15 +80,35 @@ vidList = []
 photoList = []
 window = tk.Tk()
 window.attributes('-zoomed', True)
+# window.resizable(False, False)
+window.title("PyYTPlayer")
 
-greeting = tk.Label(text="blah")
-greeting.pack()
+
+mainFrame = tk.Frame(window)
+mainFrame.pack(fill=tk.BOTH, expand=1)
 
 
-srchEntry = tk.Entry(width=25)
-srchBtn = tk.Button(text="Search", width=5)
+#Set canvas, frame and scrollbar
+srchCanvas = tk.Canvas(mainFrame)
+srchCanvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
-srchEntry.pack()
+searchScrollbar = tk.Scrollbar(mainFrame, orient=tk.VERTICAL, command=srchCanvas.yview)
+searchScrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+srchCanvas.configure(yscrollcommand=searchScrollbar.set)
+srchCanvas.bind("<Configure>", lambda evnt: srchCanvas.configure(scrollregion= srchCanvas.bbox("all")))
+
+
+srchFrame = tk.Frame(srchCanvas)
+srchCanvas.create_window((0,0), window=srchFrame, anchor="nw")
+
+srchFrame.pack()
+
+srchEntry = tk.Entry(srchFrame, width=25)
+srchBtn = tk.Button(srchFrame, text="Search", width=5)
+
+
+srchEntry.pack(pady=(10,10))
 srchBtn.pack()
 
 srchBtn.bind("<Button-1>", searchButtonFunct)
