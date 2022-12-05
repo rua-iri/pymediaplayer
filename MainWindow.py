@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 import urllib
 
 from Video import Video
+from VideoPlayer import VideoPlayer
 
 
 
@@ -62,24 +63,33 @@ def showResult(vdo, cntr):
     
     print(vdo.thumbnail)
 
+    vidPlay = VideoPlayer(vdo.url)
+    playerList.append(vidPlay)
+
+    print(vidPlay.getVideoUrl())
+
 
     #label for the video title
     vidLabel = tk.Label(labFram, text=vdo.title, padx=2);
     vidLabel.pack()
 
     #button to open the video
-    vidButton = tk.Button(labFram, text="Watch", command= lambda: openVideo(vdo.url))
+    vidButton = tk.Button(labFram, text="Watch", command= lambda: openVideo(vdo.url, cntr))
     vidButton.pack(side=tk.RIGHT)
 
 
 #TODO open a new window with the videos
 #function to play youtube videos
-def openVideo(videoCode):
+def openVideo(videoCode, cntr):
     print(videoCode)
+    playerList[cntr].getVideoUrl()
+    playerList[cntr].playVideo()
+    
 
 
 vidList = []
 photoList = []
+playerList = []
 
 window = tk.Tk()
 # window.resizable(False, False)
