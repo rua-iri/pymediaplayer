@@ -39,6 +39,8 @@ def searchYT(searchQuery):
         for i in range(10):
             showResult(vidList[i], vidCounter)
             vidCounter+=1
+    
+    window.geometry("1000x400")
 
             
 
@@ -78,8 +80,8 @@ def openVideo(videoCode):
 
 vidList = []
 photoList = []
+
 window = tk.Tk()
-window.attributes('-zoomed', True)
 # window.resizable(False, False)
 window.title("PyYTPlayer")
 
@@ -96,19 +98,17 @@ searchScrollbar = tk.Scrollbar(mainFrame, orient=tk.VERTICAL, command=srchCanvas
 searchScrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
 srchCanvas.configure(yscrollcommand=searchScrollbar.set)
-srchCanvas.bind("<Configure>", lambda evnt: srchCanvas.configure(scrollregion= srchCanvas.bbox("all")))
+srchCanvas.bind("<Configure>", lambda evnt: srchCanvas.configure(scrollregion=srchCanvas.bbox("all")))
 
 
 srchFrame = tk.Frame(srchCanvas)
 srchCanvas.create_window((0,0), window=srchFrame, anchor="nw")
 
-srchFrame.pack()
 
 srchEntry = tk.Entry(srchFrame, width=25)
-srchBtn = tk.Button(srchFrame, text="Search", width=5)
-
-
 srchEntry.pack(pady=(10,10))
+
+srchBtn = tk.Button(srchFrame, text="Search", width=5)
 srchBtn.pack()
 
 srchBtn.bind("<Button-1>", searchButtonFunct)
