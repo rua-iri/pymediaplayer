@@ -1,6 +1,6 @@
 
+import datetime
 import math
-import time
 import vlc
 import tkinter as tk
 
@@ -13,7 +13,6 @@ class VideoWindow:
 
         self.vidMediaPlayer = vlc.MediaPlayer()
 
-
         self.vidWindow = tk.Tk()
         self.vidWindow.title(vid.title)
 
@@ -24,7 +23,6 @@ class VideoWindow:
         self.vidWindow.bind("<Right>", self.skipAhead)
         self.vidWindow.bind("<Up>", self.volumeUp)
         self.vidWindow.bind("<Down>", self.volumeDown)
-
 
         self.vidWindow.bind("<Destroy>", self.closeVideoCloseWindow)
         
@@ -56,6 +54,7 @@ class VideoWindow:
             self.vidMediaPlayer.stop()
             self.vidWindow.destroy()
 
+
     def closeVideoCloseWindow(self, event):
         self.vidMediaPlayer.stop()
 
@@ -75,7 +74,6 @@ class VideoWindow:
 
     #function to increase or decrease current time location by five seconds
     def skipAhead(self, event):
-
         currentTime = self.vidMediaPlayer.get_time()
         self.vidMediaPlayer.set_time(currentTime + 5000)
         self.showTimeSymbol()
@@ -92,7 +90,6 @@ class VideoWindow:
     #function to increase volume
     def volumeUp(self, event):
         currentVol = self.vidMediaPlayer.audio_get_volume()
-        
 
         if currentVol<150:
             self.vidMediaPlayer.audio_set_volume(currentVol + 10)
@@ -128,10 +125,11 @@ class VideoWindow:
 
     
     def showTimeSymbol(self):
-        timeSymbol = str(self.vidMediaPlayer.get_time()) + " / " + str(self.vidMediaPlayer.get_length())
+        cTime = str(datetime.timedelta(seconds=math.floor(self.vidMediaPlayer.get_time()/1000)))
+
+        fTime = str(datetime.timedelta(seconds=math.floor(self.vidMediaPlayer.get_length()/1000)))
+
+        timeSymbol = cTime + " / " + fTime
 
         self.vidMediaPlayer.video_set_marquee_string(vlc.VideoMarqueeOption.Text, timeSymbol)
         self.vidMediaPlayer.video_set_marquee_int(vlc.VideoMarqueeOption.Timeout, 2000)
-
-
-        

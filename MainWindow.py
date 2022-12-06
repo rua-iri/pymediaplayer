@@ -1,4 +1,6 @@
+import datetime
 import io
+import math
 import tkinter as tk
 import requests
 import json
@@ -82,7 +84,9 @@ def showResult(vdo, cntr):
     authorLabel.pack()
     viewsLabel = tk.Label(labFram, text=str(vdo.viewCount) + " views", pady=10, padx=2, width=50);
     viewsLabel.pack()
-    lengthLabel = tk.Label(labFram, text=str(vdo.length) + " seconds", pady=10, padx=2, width=50);
+
+    vidLength = str(datetime.timedelta(seconds=vdo.length))
+    lengthLabel = tk.Label(labFram, text=vidLength, pady=10, padx=2, width=50);
     lengthLabel.pack()
     publishedLabel= tk.Label(labFram, text=vdo.publishedText, pady=10, padx=2, width=50);
     publishedLabel.pack()
