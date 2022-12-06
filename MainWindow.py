@@ -80,14 +80,15 @@ def showResult(vdo, cntr):
 
     authorLabel = tk.Label(labFram, text=vdo.author, pady=10, padx=2, width=50);
     authorLabel.pack()
-    viewsLabel = tk.Label(labFram, text=vdo.viewCount + " views", pady=10, padx=2, width=50);
+    viewsLabel = tk.Label(labFram, text=str(vdo.viewCount) + " views", pady=10, padx=2, width=50);
     viewsLabel.pack()
-    lengthLabel = tk.Label(labFram, text=vdo.length + " seconds", pady=10, padx=2, width=50);
+    lengthLabel = tk.Label(labFram, text=str(vdo.length) + " seconds", pady=10, padx=2, width=50);
     lengthLabel.pack()
     publishedLabel= tk.Label(labFram, text=vdo.publishedText, pady=10, padx=2, width=50);
     publishedLabel.pack()
 
 
+    # TODO convert the length in seconds into minutes and seconds
 
     # TODO add function to click on channel name and search
 
