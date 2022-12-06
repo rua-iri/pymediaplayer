@@ -9,9 +9,21 @@ from Video import Video
 from VideoWindow import VideoWindow
 
 
+#clear results from list so that new results can appear
+def clearResults():
+    global vidList, photoList
+
+    vidList = []
+    photoList = []
+
+    for wdgt in blahFrame.winfo_children():
+        wdgt.destroy()
+
 
 #function called by pushing the button
 def searchButtonFunct(event):
+    clearResults()
+    
     entryText = srchEntry.get()
     searchYT(entryText)
 
@@ -19,6 +31,7 @@ def searchButtonFunct(event):
 
 #function to search for relevant videos
 def searchYT(searchQuery):
+    
     searchApiUrl = "https://inv.odyssey346.dev/api/v1/search?q=" + searchQuery
     searchRes = requests.get(searchApiUrl)
     searchData = json.loads(searchRes.text)
@@ -27,7 +40,7 @@ def searchYT(searchQuery):
 
     for dat in searchData:
         try:
-            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"]))
+            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], dat["author"]))
         except:
             print("Title Not Found")
     
@@ -35,7 +48,6 @@ def searchYT(searchQuery):
         for vid in vidList:
             showResult(vid, vidCounter)
             vidCounter+=1
-    
     else:
         for i in range(10):
             showResult(vidList[i], vidCounter)
@@ -47,7 +59,7 @@ def searchYT(searchQuery):
 
 #function to add the results to labelframes which are attached to the srchFrame
 def showResult(vdo, cntr):
-    labFram = tk.LabelFrame(srchFrame, pady=2)
+    labFram = tk.LabelFrame(blahFrame, pady=2)
     labFram.pack()
 
 
@@ -104,6 +116,11 @@ srchEntry.pack(pady=(10,10), padx=(300, 300))
 
 srchBtn = tk.Button(srchFrame, text="Search", width=25, height=2)
 srchBtn.pack(pady=(10,10), padx=(300, 300))
+
+
+blahFrame = tk.Frame(srchFrame, width=1000)
+blahFrame.pack()
+
 
 srchBtn.bind("<Button-1>", searchButtonFunct)
 
