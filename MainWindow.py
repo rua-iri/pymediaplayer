@@ -4,9 +4,9 @@ import requests
 import json
 from PIL import Image, ImageTk
 import urllib
-import vlc
 
 from Video import Video
+from VideoWindow import VideoWindow
 
 
 
@@ -44,6 +44,7 @@ def searchYT(searchQuery):
     window.geometry("1000x600")
 
 
+
 #function to add the results to labelframes which are attached to the srchFrame
 def showResult(vdo, cntr):
     labFram = tk.LabelFrame(srchFrame, pady=2)
@@ -65,45 +66,14 @@ def showResult(vdo, cntr):
     vidLabel.pack()
 
     #button to open the video
-    vidButton = tk.Button(labFram, text="Watch", command= lambda: openVideo(vdo.url, cntr))
+    vidButton = tk.Button(labFram, text="Watch", command= lambda: VideoWindow(vdo))
     vidButton.pack(side=tk.RIGHT)
-
-
-#function to play youtube videos
-def openVideo(videoCode, cntr):
-    videoRes = requests.get("https://inv.odyssey346.dev/api/v1/videos/" + videoCode)
-    videoData = json.loads(videoRes.text)
-    vidUrl = videoData["formatStreams"][-1]["url"]
-
-    print(vidUrl)
-
-    vidWindow = tk.Tk()
-    vidWindow.bind("<Key>", closeVideo)
-
-    vidMediaPlayer.set_xwindow(vidWindow.winfo_id())
-    vidMedia = vlc.Media(vidUrl)
-    vidMediaPlayer.set_media(vidMedia)
-    vidMediaPlayer.play()
-
-
-
-#function to stop a video from playing
-def closeVideo(event):
-    if event.char=="q":
-        if vidMediaPlayer.is_playing():
-            vidMediaPlayer.stop()
-        else:
-            print("Error: no video is currently playing")
-
-
     
 
 
 vidList = []
 photoList = []
-playerList = []
 
-vidMediaPlayer = vlc.MediaPlayer()
 
 window = tk.Tk()
 window.geometry("1000x500")
