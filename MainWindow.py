@@ -23,21 +23,35 @@ def clearResults():
 
 #function called by pushing the button
 def searchButtonFunct(event):
-    clearResults()
+    entryText = srchEntry.get().strip()
 
-    entryText = srchEntry.get()
+    #check that the textbox isn't empty
+    if entryText!="":
+        clearResults()
+        genSearchLabel("Search for: " + entryText)
+        searchYT(entryText)
 
-    searchLabel = tk.Label(resultsFrame, text="Search for: " + entryText, padx=2, width=50, height=5)
-    searchLabel.pack(side=tk.TOP)
 
-    searchYT(entryText)
+#function to focus on searchbar if / key is pressed (just like google, youtube etc)
+def focusSearchBar(evnt):
+    if evnt.char=="/":
+        srchEntry.focus()
+        srchCanvas.yview_moveto(0.0)
+
+
+#function to generate the label at the top of every search
+def genSearchLabel(labelText):
+    searchLabel = tk.Label(resultsFrame, text=labelText, font=("Arial", 25))
+    searchLabel.pack(side=tk.TOP, padx=2, pady=(20, 10))
 
 
 
 #function to search for relevant videos
 def searchYT(searchQuery):
+
+    # TODO add function to check for active instances with an api from https://api.invidious.io/instances.json
     
-    searchApiUrl = "https://inv.odyssey346.dev/api/v1/search?q=" + searchQuery
+    searchApiUrl = "https://vid.puffyan.us/api/v1/search?q=" + searchQuery
     searchRes = requests.get(searchApiUrl)
     searchData = json.loads(searchRes.text)
 
@@ -64,7 +78,7 @@ def searchYT(searchQuery):
 
 #function to add the results to labelframes which are attached to the srchFrame
 def showResult(vdo, cntr):
-    labFram = tk.LabelFrame(resultsFrame, pady=4)
+    labFram = tk.LabelFrame(resultsFrame)
     labFram.pack()
 
     imgPage = urllib.request.urlopen(vdo.thumbnail)
@@ -76,12 +90,13 @@ def showResult(vdo, cntr):
     imgLabel.pack(side=tk.LEFT)
 
     #button to open the video
-    vidButton = tk.Button(labFram, text=vdo.title, padx=2, width=50, height=5, command= lambda: VideoWindow(vdo))
+    vidButton = tk.Button(labFram, text=vdo.title, padx=2, width=50, height=5, wraplength=300, command= lambda: VideoWindow(vdo))
     vidButton.pack()
 
+    #button to search the author's channel
     authorButton = tk.Button(labFram, text=vdo.author, pady=10, padx=2, width=50, height=5);
     authorButton.pack()
-    viewsLabel = tk.Label(labFram, text=str(vdo.viewCount) + " views", pady=10, padx=2, width=50);
+    viewsLabel = tk.Label(labFram, text=("{:,}".format(vdo.viewCount) + " views"), pady=10, padx=2, width=50);
     viewsLabel.pack()
 
     vidLength = str(datetime.timedelta(seconds=vdo.length))
@@ -94,14 +109,13 @@ def showResult(vdo, cntr):
     # TODO add function to click on channel name and search
     
 
-def searchTrending():
-
+#function to search trending videos (for some reason this needs an argument even if it's set to None)
+def searchTrending(arg=None):
     clearResults()
 
-    searchLabel = tk.Label(resultsFrame, text="Trending", padx=2, width=50, height=5)
-    searchLabel.pack(side=tk.TOP)
-    
-    searchApiUrl = "https://inv.odyssey346.dev/api/v1/popular"
+    genSearchLabel("Trending")
+
+    searchApiUrl = "https://vid.puffyan.us/api/v1/popular"
     searchRes = requests.get(searchApiUrl)
     searchData = json.loads(searchRes.text)
 
@@ -122,9 +136,7 @@ def searchTrending():
             showResult(vid, vidCounter)
             vidCounter+=1
     
-    
     window.geometry("1000x600")
-
 
 
 
@@ -132,11 +144,9 @@ def searchTrending():
 vidList = []
 photoList = []
 
-
 window = tk.Tk()
 window.geometry("1000x500")
 window.title("PyYTPlayer")
-
 
 mainFrame = tk.Frame(window)
 mainFrame.pack(fill=tk.BOTH, expand=1)
@@ -145,22 +155,40 @@ mainFrame.pack(fill=tk.BOTH, expand=1)
 srchCanvas = tk.Canvas(mainFrame)
 srchCanvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
-searchScrollbar = tk.Scrollbar(mainFrame, orient=tk.VERTICAL, command=srchCanvas.yview)
-searchScrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+srchScrollbar = tk.Scrollbar(mainFrame, orient=tk.VERTICAL, command=srchCanvas.yview)
+srchScrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-srchCanvas.configure(yscrollcommand=searchScrollbar.set)
+srchCanvas.bind("<1>", lambda evnt: srchCanvas.focus_set())
+srchCanvas.configure(yscrollcommand=srchScrollbar.set)
 srchCanvas.bind("<Configure>", lambda evnt: srchCanvas.configure(scrollregion=srchCanvas.bbox("all")))
+srchCanvas.bind("<Up>", lambda evnt: srchCanvas.yview_scroll(-1, "units"))
+srchCanvas.bind("<Down>", lambda evnt: srchCanvas.yview_scroll(1, "units"))
+
+srchCanvas.focus_set()
 
 
 srchFrame = tk.Frame(srchCanvas, width=1000)
 srchCanvas.create_window((0,0), window=srchFrame, anchor="nw")
 
 
-srchEntry = tk.Entry(srchFrame, width=50)
-srchEntry.pack(pady=(10,10), padx=(300, 300))
+# LabelFrame for the top bar
+homeLabFrame = tk.LabelFrame(srchFrame, pady=4)
+homeLabFrame.pack()
 
-srchBtn = tk.Button(srchFrame, text="Search", width=25, height=2)
-srchBtn.pack(pady=(10,10), padx=(300, 300))
+
+
+
+# LabelFrame for the search bar
+srchLabFrame = tk.LabelFrame(srchFrame, pady=4)
+srchLabFrame.pack()
+
+logoImg = tk.PhotoImage(file="./assets/youtube-icon-blue.png")
+homeBtn = tk.Button(srchLabFrame, image=logoImg)
+homeBtn.pack(side=tk.LEFT)
+srchEntry = tk.Entry(srchLabFrame,font=("Arial", 16), width=30)
+srchEntry.pack(side=tk.LEFT, pady=(10,10), padx=(15, 15))
+srchBtn = tk.Button(srchLabFrame, text="Search", width=25, height=2)
+srchBtn.pack(side=tk.RIGHT, pady=(10,10), padx=(15, 15))
 
 
 resultsFrame = tk.Frame(srchFrame, width=1000)
@@ -169,10 +197,14 @@ resultsFrame.pack()
 searchTrending()
 
 
+#bind search button and text entry box to search function
 srchBtn.bind("<Button-1>", searchButtonFunct)
+srchBtn.bind("<space>", searchButtonFunct)
+srchEntry.bind("<Return>", searchButtonFunct)
 
+homeBtn.bind("<Button-1>", searchTrending)
 
+window.bind("<Key>", focusSearchBar)
 
 window.mainloop()
-
 
