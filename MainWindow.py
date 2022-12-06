@@ -4,9 +4,9 @@ import requests
 import json
 from PIL import Image, ImageTk
 import urllib
+import vlc
 
 from Video import Video
-from VideoPlayer import VideoPlayer
 
 
 
@@ -41,9 +41,7 @@ def searchYT(searchQuery):
             showResult(vidList[i], vidCounter)
             vidCounter+=1
     
-    window.geometry("1000x400")
-
-            
+    window.geometry("1000x600")
 
 
 
@@ -61,13 +59,6 @@ def showResult(vdo, cntr):
     imgLabel.pack(side=tk.LEFT)
 
     
-    print(vdo.thumbnail)
-
-    vidPlay = VideoPlayer(vdo.url)
-    playerList.append(vidPlay)
-
-    print(vidPlay.getVideoUrl())
-
 
     #label for the video title
     vidLabel = tk.Label(labFram, text=vdo.title, padx=2);
@@ -78,12 +69,19 @@ def showResult(vdo, cntr):
     vidButton.pack(side=tk.RIGHT)
 
 
-#TODO open a new window with the videos
 #function to play youtube videos
 def openVideo(videoCode, cntr):
-    print(videoCode)
-    playerList[cntr].getVideoUrl()
-    playerList[cntr].playVideo()
+    videoRes = requests.get("https://inv.odyssey346.dev/api/v1/videos/" + videoCode)
+    videoData = json.loads(videoRes.text)
+    vidUrl = videoData["formatStreams"][-1]["url"]
+
+    print(vidUrl)
+
+    vidMedia = vlc.Media(vidUrl)
+    vidMediaPlayer.set_media(vidMedia)
+    vidMediaPlayer.play()
+
+
     
 
 
@@ -91,7 +89,10 @@ vidList = []
 photoList = []
 playerList = []
 
+vidMediaPlayer = vlc.MediaPlayer()
+
 window = tk.Tk()
+window.geometry("1000x500")
 # window.resizable(False, False)
 window.title("PyYTPlayer")
 
@@ -111,15 +112,15 @@ srchCanvas.configure(yscrollcommand=searchScrollbar.set)
 srchCanvas.bind("<Configure>", lambda evnt: srchCanvas.configure(scrollregion=srchCanvas.bbox("all")))
 
 
-srchFrame = tk.Frame(srchCanvas)
+srchFrame = tk.Frame(srchCanvas, width=1000)
 srchCanvas.create_window((0,0), window=srchFrame, anchor="nw")
 
 
-srchEntry = tk.Entry(srchFrame, width=25)
-srchEntry.pack(pady=(10,10))
+srchEntry = tk.Entry(srchFrame, width=50)
+srchEntry.pack(pady=(10,10), padx=(300, 300))
 
-srchBtn = tk.Button(srchFrame, text="Search", width=5)
-srchBtn.pack()
+srchBtn = tk.Button(srchFrame, text="Search", width=25, height=2)
+srchBtn.pack(pady=(10,10), padx=(300, 300))
 
 srchBtn.bind("<Button-1>", searchButtonFunct)
 
