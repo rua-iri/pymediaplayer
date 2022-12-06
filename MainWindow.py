@@ -44,7 +44,7 @@ def searchYT(searchQuery):
     window.geometry("1000x600")
 
 
-
+#function to add the results to labelframes which are attached to the srchFrame
 def showResult(vdo, cntr):
     labFram = tk.LabelFrame(srchFrame, pady=2)
     labFram.pack()
@@ -82,6 +82,16 @@ def openVideo(videoCode, cntr):
     vidMediaPlayer.play()
 
 
+
+#function to stop a video from playing
+def closeVideo(event):
+    if event.char=="q":
+        if vidMediaPlayer.is_playing():
+            vidMediaPlayer.stop()
+        else:
+            print("Error: no video is currently playing")
+
+
     
 
 
@@ -93,7 +103,6 @@ vidMediaPlayer = vlc.MediaPlayer()
 
 window = tk.Tk()
 window.geometry("1000x500")
-# window.resizable(False, False)
 window.title("PyYTPlayer")
 
 
@@ -123,6 +132,7 @@ srchBtn = tk.Button(srchFrame, text="Search", width=25, height=2)
 srchBtn.pack(pady=(10,10), padx=(300, 300))
 
 srchBtn.bind("<Button-1>", searchButtonFunct)
+window.bind("<Key>", closeVideo)
 
 
 window.mainloop()
