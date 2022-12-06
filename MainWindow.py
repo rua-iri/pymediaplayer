@@ -23,8 +23,12 @@ def clearResults():
 #function called by pushing the button
 def searchButtonFunct(event):
     clearResults()
-    
+
     entryText = srchEntry.get()
+
+    searchLabel = tk.Label(srchFrame, text="Search for: " + entryText, padx=2, width=50, height=5)
+    searchLabel.pack(side=tk.TOP)
+
     searchYT(entryText)
 
 
@@ -40,7 +44,7 @@ def searchYT(searchQuery):
 
     for dat in searchData:
         try:
-            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], dat["author"]))
+            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], dat["author"], dat["viewCount"], dat["lengthSeconds"], dat["publishedText"]))
         except:
             print("Title Not Found")
     
@@ -59,9 +63,8 @@ def searchYT(searchQuery):
 
 #function to add the results to labelframes which are attached to the srchFrame
 def showResult(vdo, cntr):
-    labFram = tk.LabelFrame(blahFrame, pady=2)
+    labFram = tk.LabelFrame(blahFrame, pady=4)
     labFram.pack()
-
 
     imgPage = urllib.request.urlopen(vdo.thumbnail)
     pilImg = Image.open(io.BytesIO(imgPage.read()))
@@ -71,15 +74,24 @@ def showResult(vdo, cntr):
     imgLabel = tk.Label(labFram, image=photoList[cntr])
     imgLabel.pack(side=tk.LEFT)
 
-    
-
-    #label for the video title
-    vidLabel = tk.Label(labFram, text=vdo.title, padx=2);
-    vidLabel.pack()
-
     #button to open the video
-    vidButton = tk.Button(labFram, text="Watch", command= lambda: VideoWindow(vdo))
-    vidButton.pack(side=tk.RIGHT)
+    vidButton = tk.Button(labFram, text=vdo.title, padx=2, width=50, height=5, command= lambda: VideoWindow(vdo))
+    vidButton.pack()
+
+    authorLabel = tk.Label(labFram, text=vdo.author, pady=10, padx=2, width=50);
+    authorLabel.pack()
+    viewsLabel = tk.Label(labFram, text=vdo.viewCount + " views", pady=10, padx=2, width=50);
+    viewsLabel.pack()
+    lengthLabel = tk.Label(labFram, text=vdo.length + " seconds", pady=10, padx=2, width=50);
+    lengthLabel.pack()
+    publishedLabel= tk.Label(labFram, text=vdo.publishedText, pady=10, padx=2, width=50);
+    publishedLabel.pack()
+
+
+
+    # TODO add function to click on channel name and search
+
+    
     
 
 

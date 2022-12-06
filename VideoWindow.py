@@ -20,6 +20,9 @@ class VideoWindow:
         self.vidWindow.bind("<space>", self.playPauseVideo)
         self.vidWindow.bind("<Left>", self.skipBack)
         self.vidWindow.bind("<Right>", self.skipAhead)
+        self.vidWindow.bind("<Up>", self.volumeUp)
+        self.vidWindow.bind("<Down>", self.volumeDown)
+
 
         self.vidWindow.bind("<Destroy>", self.closeVideoCloseWindow)
 
