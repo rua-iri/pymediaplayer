@@ -6,7 +6,7 @@ import json
 class Video:
     
 
-    def __init__(self, title, code, thumbnail, author, viewCount, length, publishedText):
+    def __init__(self, title, code, thumbnail, author, viewCount, length, publishedText, authorId):
         self.title = title
         self.code = code
         self.thumbnail = thumbnail
@@ -14,6 +14,7 @@ class Video:
         self.viewCount = viewCount
         self.length = length
         self.publishedText = publishedText
+        self.authorId = authorId
 
 
     #function for getting more data about a video by querying another endpoint

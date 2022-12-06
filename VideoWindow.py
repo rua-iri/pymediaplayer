@@ -1,6 +1,7 @@
 
 import datetime
 import math
+import time
 import vlc
 import tkinter as tk
 
@@ -30,7 +31,7 @@ class VideoWindow:
 
 
 
-
+    #function to open a new mediaplayer and play the selected video
     def openVideo(self):
         self.vid.getData()
 
@@ -53,7 +54,6 @@ class VideoWindow:
         if event.char=="q":
             self.vidMediaPlayer.stop()
             self.vidWindow.destroy()
-
 
     def closeVideoCloseWindow(self, event):
         self.vidMediaPlayer.stop()
@@ -109,26 +109,32 @@ class VideoWindow:
 
 
 
+    #function to show volume bar over the video
     def showVolumeSymbol(self):
+        #add time delay so that updated volume level is read instead of old
+        time.sleep(0.01)
+        
         currentVol = self.vidMediaPlayer.audio_get_volume()
         volSymbol = ""
 
+        #generate volume symbol based on what percentage the volume is at (0%-150%)
         for i in range(math.ceil(currentVol / 10)):
                 volSymbol+="|"
             
         for x in range(math.ceil(15 - (currentVol / 10))):
             volSymbol+="."
 
+
         self.vidMediaPlayer.video_set_marquee_string(vlc.VideoMarqueeOption.Text, volSymbol)
         self.vidMediaPlayer.video_set_marquee_int(vlc.VideoMarqueeOption.Timeout, 2000)
 
 
     
+    #function to show the current time against the total length of the video
     def showTimeSymbol(self):
+        #current time and full time
         cTime = str(datetime.timedelta(seconds=math.floor(self.vidMediaPlayer.get_time()/1000)))
-
         fTime = str(datetime.timedelta(seconds=math.floor(self.vidMediaPlayer.get_length()/1000)))
-
         timeSymbol = cTime + " / " + fTime
 
         self.vidMediaPlayer.video_set_marquee_string(vlc.VideoMarqueeOption.Text, timeSymbol)

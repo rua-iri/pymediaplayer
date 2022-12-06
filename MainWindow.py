@@ -21,15 +21,16 @@ def clearResults():
         wdgt.destroy()
 
 
+
 #function called by pushing the button
 def searchButtonFunct(event):
     entryText = srchEntry.get().strip()
 
     #check that the textbox isn't empty
     if entryText!="":
-        clearResults()
         genSearchLabel("Search for: " + entryText)
         searchYT(entryText)
+
 
 
 #function to focus on searchbar if / key is pressed (just like google, youtube etc)
@@ -37,6 +38,7 @@ def focusSearchBar(evnt):
     if evnt.char=="/":
         srchEntry.focus()
         srchCanvas.yview_moveto(0.0)
+
 
 
 #function to generate the label at the top of every search
@@ -48,9 +50,10 @@ def genSearchLabel(labelText):
 
 #function to search for relevant videos
 def searchYT(searchQuery):
+    clearResults()
 
     # TODO add function to check for active instances with an api from https://api.invidious.io/instances.json
-    
+
     searchApiUrl = "https://vid.puffyan.us/api/v1/search?q=" + searchQuery
     searchRes = requests.get(searchApiUrl)
     searchData = json.loads(searchRes.text)
@@ -59,7 +62,7 @@ def searchYT(searchQuery):
 
     for dat in searchData:
         try:
-            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], dat["author"], dat["viewCount"], dat["lengthSeconds"], dat["publishedText"]))
+            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], dat["author"], dat["viewCount"], dat["lengthSeconds"], dat["publishedText"], dat["authorId"]))
         except:
             print("Title Not Found")
     
@@ -70,6 +73,69 @@ def searchYT(searchQuery):
     else:
         for i in range(10):
             showResult(vidList[i], vidCounter)
+            vidCounter+=1
+    
+    window.geometry("1000x600")
+
+
+
+#function to search for relevant videos
+def searchChannel(channelName, channelId):
+    clearResults()
+
+    searchApiUrl = "https://vid.puffyan.us/api/v1/channels/latest/" + channelId
+    searchRes = requests.get(searchApiUrl)
+    searchData = json.loads(searchRes.text)
+
+    vidCounter = 0
+
+    for dat in searchData:
+        try:
+            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], channelName, dat["viewCount"], dat["lengthSeconds"], dat["publishedText"], dat["authorId"]))
+        except:
+            print("Title Not Found")
+
+
+    genSearchLabel(vidList[0].author)
+    
+    if len(vidList)<10:
+        for vid in vidList:
+            showResult(vid, vidCounter)
+            vidCounter+=1
+    else:
+        for i in range(10):
+            showResult(vidList[i], vidCounter)
+            vidCounter+=1
+    
+    window.geometry("1000x600")
+
+
+
+#function to search trending videos (for some reason this needs an argument even if it's set to None)
+def searchTrending(arg=None):
+    clearResults()
+
+    genSearchLabel("Trending")
+
+    searchApiUrl = "https://vid.puffyan.us/api/v1/popular"
+    searchRes = requests.get(searchApiUrl)
+    searchData = json.loads(searchRes.text)
+
+    vidCounter = 0
+
+    #only add the first 10 videos to the trending page
+    while len(vidList)<11:
+        try:
+            vidList.append(Video(searchData[vidCounter]["title"], searchData[vidCounter]["videoId"], searchData[vidCounter]["videoThumbnails"][3]["url"], searchData[vidCounter]["author"], searchData[vidCounter]["viewCount"], searchData[vidCounter]["lengthSeconds"], searchData[vidCounter]["publishedText"], searchData[vidCounter]["authorId"]))
+        except:
+            print("Title Not Found")
+        
+        vidCounter+=1
+
+    vidCounter = 0
+    
+    for vid in vidList:
+            showResult(vid, vidCounter)
             vidCounter+=1
     
     window.geometry("1000x600")
@@ -94,7 +160,7 @@ def showResult(vdo, cntr):
     vidButton.pack()
 
     #button to search the author's channel
-    authorButton = tk.Button(labFram, text=vdo.author, pady=10, padx=2, width=50, height=5);
+    authorButton = tk.Button(labFram, text=vdo.author, pady=10, padx=2, width=50, height=5, command= lambda: searchChannel(vdo.author, vdo.authorId))
     authorButton.pack()
     viewsLabel = tk.Label(labFram, text=("{:,}".format(vdo.viewCount) + " views"), pady=10, padx=2, width=50);
     viewsLabel.pack()
@@ -106,47 +172,19 @@ def showResult(vdo, cntr):
     publishedLabel.pack()
 
 
-    # TODO add function to click on channel name and search
-    
-
-#function to search trending videos (for some reason this needs an argument even if it's set to None)
-def searchTrending(arg=None):
-    clearResults()
-
-    genSearchLabel("Trending")
-
-    searchApiUrl = "https://vid.puffyan.us/api/v1/popular"
-    searchRes = requests.get(searchApiUrl)
-    searchData = json.loads(searchRes.text)
-
-    vidCounter = 0
-
-    while len(vidList)<11:
-        try:
-            vidList.append(Video(searchData[vidCounter]["title"], searchData[vidCounter]["videoId"], searchData[vidCounter]["videoThumbnails"][3]["url"], searchData[vidCounter]["author"], searchData[vidCounter]["viewCount"], searchData[vidCounter]["lengthSeconds"], searchData[vidCounter]["publishedText"]))
-        except:
-            print("Title Not Found")
-        
-        vidCounter+=1
 
 
-    vidCounter = 0
-    
-    for vid in vidList:
-            showResult(vid, vidCounter)
-            vidCounter+=1
-    
-    window.geometry("1000x600")
-
-
-
-
+# empty lists to hold data about currently selected videos
 vidList = []
 photoList = []
 
+#main window for the application
 window = tk.Tk()
 window.geometry("1000x500")
 window.title("PyYTPlayer")
+
+window.tk.call("source", "assets/Azure-ttk-theme-main/azure.tcl")
+window.tk.call("set_theme", "light")
 
 mainFrame = tk.Frame(window)
 mainFrame.pack(fill=tk.BOTH, expand=1)
@@ -158,6 +196,7 @@ srchCanvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 srchScrollbar = tk.Scrollbar(mainFrame, orient=tk.VERTICAL, command=srchCanvas.yview)
 srchScrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+#bindings for scrolling page
 srchCanvas.bind("<1>", lambda evnt: srchCanvas.focus_set())
 srchCanvas.configure(yscrollcommand=srchScrollbar.set)
 srchCanvas.bind("<Configure>", lambda evnt: srchCanvas.configure(scrollregion=srchCanvas.bbox("all")))
@@ -171,30 +210,28 @@ srchFrame = tk.Frame(srchCanvas, width=1000)
 srchCanvas.create_window((0,0), window=srchFrame, anchor="nw")
 
 
-# LabelFrame for the top bar
-homeLabFrame = tk.LabelFrame(srchFrame, pady=4)
-homeLabFrame.pack()
-
-
-
-
 # LabelFrame for the search bar
 srchLabFrame = tk.LabelFrame(srchFrame, pady=4)
 srchLabFrame.pack()
 
+# search bar widgets
 logoImg = tk.PhotoImage(file="./assets/youtube-icon-blue.png")
 homeBtn = tk.Button(srchLabFrame, image=logoImg)
-homeBtn.pack(side=tk.LEFT)
-srchEntry = tk.Entry(srchLabFrame,font=("Arial", 16), width=30)
-srchEntry.pack(side=tk.LEFT, pady=(10,10), padx=(15, 15))
+homeBtn.pack(side=tk.LEFT, pady=(10,10), padx=(15, 15))
 srchBtn = tk.Button(srchLabFrame, text="Search", width=25, height=2)
 srchBtn.pack(side=tk.RIGHT, pady=(10,10), padx=(15, 15))
+srchEntry = tk.Entry(srchLabFrame,font=("Arial", 16), width=30)
+srchEntry.pack(side=tk.RIGHT, pady=(10,10), padx=(15, 15))
+
 
 
 resultsFrame = tk.Frame(srchFrame, width=1000)
 resultsFrame.pack()
 
 searchTrending()
+
+
+# TODO maybe add vim keybindings to control the application
 
 
 #bind search button and text entry box to search function
