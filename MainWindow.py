@@ -1,6 +1,5 @@
 import datetime
 import io
-import math
 import tkinter as tk
 import requests
 import json
@@ -18,7 +17,7 @@ def clearResults():
     vidList = []
     photoList = []
 
-    for wdgt in blahFrame.winfo_children():
+    for wdgt in resultsFrame.winfo_children():
         wdgt.destroy()
 
 
@@ -28,7 +27,7 @@ def searchButtonFunct(event):
 
     entryText = srchEntry.get()
 
-    searchLabel = tk.Label(srchFrame, text="Search for: " + entryText, padx=2, width=50, height=5)
+    searchLabel = tk.Label(resultsFrame, text="Search for: " + entryText, padx=2, width=50, height=5)
     searchLabel.pack(side=tk.TOP)
 
     searchYT(entryText)
@@ -65,7 +64,7 @@ def searchYT(searchQuery):
 
 #function to add the results to labelframes which are attached to the srchFrame
 def showResult(vdo, cntr):
-    labFram = tk.LabelFrame(blahFrame, pady=4)
+    labFram = tk.LabelFrame(resultsFrame, pady=4)
     labFram.pack()
 
     imgPage = urllib.request.urlopen(vdo.thumbnail)
@@ -80,8 +79,8 @@ def showResult(vdo, cntr):
     vidButton = tk.Button(labFram, text=vdo.title, padx=2, width=50, height=5, command= lambda: VideoWindow(vdo))
     vidButton.pack()
 
-    authorLabel = tk.Label(labFram, text=vdo.author, pady=10, padx=2, width=50);
-    authorLabel.pack()
+    authorButton = tk.Button(labFram, text=vdo.author, pady=10, padx=2, width=50, height=5);
+    authorButton.pack()
     viewsLabel = tk.Label(labFram, text=str(vdo.viewCount) + " views", pady=10, padx=2, width=50);
     viewsLabel.pack()
 
@@ -92,12 +91,42 @@ def showResult(vdo, cntr):
     publishedLabel.pack()
 
 
-    # TODO convert the length in seconds into minutes and seconds
-
     # TODO add function to click on channel name and search
+    
 
+def searchTrending():
+
+    clearResults()
+
+    searchLabel = tk.Label(resultsFrame, text="Trending", padx=2, width=50, height=5)
+    searchLabel.pack(side=tk.TOP)
+    
+    searchApiUrl = "https://inv.odyssey346.dev/api/v1/popular"
+    searchRes = requests.get(searchApiUrl)
+    searchData = json.loads(searchRes.text)
+
+    vidCounter = 0
+
+    while len(vidList)<11:
+        try:
+            vidList.append(Video(searchData[vidCounter]["title"], searchData[vidCounter]["videoId"], searchData[vidCounter]["videoThumbnails"][3]["url"], searchData[vidCounter]["author"], searchData[vidCounter]["viewCount"], searchData[vidCounter]["lengthSeconds"], searchData[vidCounter]["publishedText"]))
+        except:
+            print("Title Not Found")
+        
+        vidCounter+=1
+
+
+    vidCounter = 0
+    
+    for vid in vidList:
+            showResult(vid, vidCounter)
+            vidCounter+=1
     
     
+    window.geometry("1000x600")
+
+
+
 
 
 vidList = []
@@ -111,7 +140,6 @@ window.title("PyYTPlayer")
 
 mainFrame = tk.Frame(window)
 mainFrame.pack(fill=tk.BOTH, expand=1)
-
 
 #Set canvas, frame and scrollbar
 srchCanvas = tk.Canvas(mainFrame)
@@ -135,8 +163,10 @@ srchBtn = tk.Button(srchFrame, text="Search", width=25, height=2)
 srchBtn.pack(pady=(10,10), padx=(300, 300))
 
 
-blahFrame = tk.Frame(srchFrame, width=1000)
-blahFrame.pack()
+resultsFrame = tk.Frame(srchFrame, width=1000)
+resultsFrame.pack()
+
+searchTrending()
 
 
 srchBtn.bind("<Button-1>", searchButtonFunct)
