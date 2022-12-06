@@ -77,6 +77,10 @@ def openVideo(videoCode, cntr):
 
     print(vidUrl)
 
+    vidWindow = tk.Tk()
+    vidWindow.bind("<Key>", closeVideo)
+
+    vidMediaPlayer.set_xwindow(vidWindow.winfo_id())
     vidMedia = vlc.Media(vidUrl)
     vidMediaPlayer.set_media(vidMedia)
     vidMediaPlayer.play()
@@ -132,7 +136,7 @@ srchBtn = tk.Button(srchFrame, text="Search", width=25, height=2)
 srchBtn.pack(pady=(10,10), padx=(300, 300))
 
 srchBtn.bind("<Button-1>", searchButtonFunct)
-window.bind("<Key>", closeVideo)
+
 
 
 window.mainloop()
