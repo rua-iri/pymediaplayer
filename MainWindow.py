@@ -10,6 +10,14 @@ from Video import Video
 from VideoWindow import VideoWindow
 
 
+#function to get an instance on invidious
+def getInstance():
+    instanceRes = requests.get("https://api.invidious.io/instances.json?pretty=1&sort_by=type,users")
+    instanceData = json.loads(instanceRes.text)
+    
+
+
+
 #clear results from list so that new results can appear
 def clearResults():
     global vidList, photoList
