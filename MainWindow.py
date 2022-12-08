@@ -75,7 +75,7 @@ def searchYT(searchQuery):
 
     for dat in searchData:
         try:
-            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], dat["author"], dat["viewCount"], dat["lengthSeconds"], dat["publishedText"], dat["authorId"]))
+            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], dat["author"], dat["viewCount"], dat["lengthSeconds"], dat["publishedText"], dat["authorId"], baseUrl))
         except:
             print("Title Not Found")
     
@@ -104,7 +104,7 @@ def searchChannel(channelName, channelId):
 
     for dat in searchData:
         try:
-            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], channelName, dat["viewCount"], dat["lengthSeconds"], dat["publishedText"], dat["authorId"]))
+            vidList.append(Video(dat["title"], dat["videoId"], dat["videoThumbnails"][3]["url"], channelName, dat["viewCount"], dat["lengthSeconds"], dat["publishedText"], dat["authorId"], baseUrl))
         except:
             print("Title Not Found")
 
@@ -139,7 +139,7 @@ def searchTrending(arg=None):
     #only add the first 10 videos to the trending page
     while len(vidList)<11:
         try:
-            vidList.append(Video(searchData[vidCounter]["title"], searchData[vidCounter]["videoId"], searchData[vidCounter]["videoThumbnails"][3]["url"], searchData[vidCounter]["author"], searchData[vidCounter]["viewCount"], searchData[vidCounter]["lengthSeconds"], searchData[vidCounter]["publishedText"], searchData[vidCounter]["authorId"]))
+            vidList.append(Video(searchData[vidCounter]["title"], searchData[vidCounter]["videoId"], searchData[vidCounter]["videoThumbnails"][3]["url"], searchData[vidCounter]["author"], searchData[vidCounter]["viewCount"], searchData[vidCounter]["lengthSeconds"], searchData[vidCounter]["publishedText"], searchData[vidCounter]["authorId"], baseUrl))
         except:
             print("Title Not Found")
         
