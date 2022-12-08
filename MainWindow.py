@@ -14,7 +14,14 @@ from VideoWindow import VideoWindow
 def getInstance():
     instanceRes = requests.get("https://api.invidious.io/instances.json?pretty=1&sort_by=type,users")
     instanceData = json.loads(instanceRes.text)
+
+    for inst in instanceData:
+
+        if inst[1]["api"]==True:
+            liveInstance = inst
+            break
     
+    return liveInstance[1]["uri"]
 
 
 
@@ -60,9 +67,7 @@ def genSearchLabel(labelText):
 def searchYT(searchQuery):
     clearResults()
 
-    # TODO add function to check for active instances with an api from https://api.invidious.io/instances.json
-
-    searchApiUrl = "https://vid.puffyan.us/api/v1/search?q=" + searchQuery
+    searchApiUrl = baseUrl + "/api/v1/search?q=" + searchQuery
     searchRes = requests.get(searchApiUrl)
     searchData = json.loads(searchRes.text)
 
@@ -91,7 +96,7 @@ def searchYT(searchQuery):
 def searchChannel(channelName, channelId):
     clearResults()
 
-    searchApiUrl = "https://vid.puffyan.us/api/v1/channels/latest/" + channelId
+    searchApiUrl = baseUrl + "/api/v1/channels/latest/" + channelId
     searchRes = requests.get(searchApiUrl)
     searchData = json.loads(searchRes.text)
 
@@ -125,7 +130,7 @@ def searchTrending(arg=None):
 
     genSearchLabel("Trending")
 
-    searchApiUrl = "https://vid.puffyan.us/api/v1/popular"
+    searchApiUrl = baseUrl + "/api/v1/popular"
     searchRes = requests.get(searchApiUrl)
     searchData = json.loads(searchRes.text)
 
@@ -185,6 +190,9 @@ def showResult(vdo, cntr):
 # empty lists to hold data about currently selected videos
 vidList = []
 photoList = []
+
+#find live instance with api for the application to query
+baseUrl = getInstance()
 
 #main window for the application
 window = tk.Tk()
